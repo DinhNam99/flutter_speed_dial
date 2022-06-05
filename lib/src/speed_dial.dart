@@ -408,32 +408,30 @@ class _SpeedDialState extends State<SpeedDial>
 
     var animatedFloatingButton = AnimatedBuilder(
       animation: _controller,
-      builder: (context, ch) => CompositedTransformTarget(
-          link: _layerLink,
-          key: dialKey,
-          child: AnimatedFloatingButton(
-            visible: widget.visible,
-            tooltip: widget.tooltip,
-            dialRoot: widget.dialRoot != null
-                ? widget.dialRoot!(context, _open, _toggleChildren)
-                : null,
-            backgroundColor: widget.backgroundColor != null
-                ? backgroundColorTween.lerp(_controller.value)
-                : null,
-            foregroundColor: widget.foregroundColor != null
-                ? foregroundColorTween.lerp(_controller.value)
-                : null,
-            elevation: widget.elevation,
-            onLongPress: _toggleChildren,
-            callback: (_open || widget.onPress == null)
-                ? _toggleChildren
-                : widget.onPress,
-            size: widget.buttonSize,
-            label: widget.label != null ? label : null,
-            child: child,
-            heroTag: widget.heroTag,
-            shape: widget.shape,
-          )),
+      builder: (context, ch) => AnimatedFloatingButton(
+        visible: !_open,
+        tooltip: widget.tooltip,
+        dialRoot: widget.dialRoot != null
+            ? widget.dialRoot!(context, _open, _toggleChildren)
+            : null,
+        backgroundColor: widget.backgroundColor != null
+            ? backgroundColorTween.lerp(_controller.value)
+            : null,
+        foregroundColor: widget.foregroundColor != null
+            ? foregroundColorTween.lerp(_controller.value)
+            : null,
+        elevation: widget.elevation,
+        onLongPress: _toggleChildren,
+        callback: (_open || widget.onPress == null)
+            ? _toggleChildren
+            : widget.onPress,
+        // size: Size(56, !_open?56:0),
+        size: widget.buttonSize,
+        label: widget.label != null ? label : null,
+        child: child,
+        heroTag: widget.heroTag,
+        shape: widget.shape,
+      ),
     );
 
     return animatedFloatingButton;
@@ -534,64 +532,21 @@ class _ChildrensOverlay extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Stack(
-      fit: StackFit.loose,
+      alignment: AlignmentDirectional.bottomEnd,
       children: [
-        Positioned(
-            child: CompositedTransformFollower(
-          followerAnchor: widget.direction.isDown
-              ? widget.switchLabelPosition
-                  ? Alignment.topLeft
-                  : Alignment.topRight
-              : widget.direction.isUp
-                  ? widget.switchLabelPosition
-                      ? Alignment.bottomLeft
-                      : Alignment.bottomRight
-                  : widget.direction.isLeft
-                      ? Alignment.centerRight
-                      : widget.direction.isRight
-                          ? Alignment.centerLeft
-                          : Alignment.center,
-          offset: widget.direction.isDown
-              ? Offset(
-                  (widget.switchLabelPosition ||
-                              dialKey.globalPaintBounds == null
-                          ? 0
-                          : dialKey.globalPaintBounds!.size.width) +
-                      max(widget.childrenButtonSize.height - 56, 0) / 2,
-                  dialKey.globalPaintBounds!.size.height)
-              : widget.direction.isUp
-                  ? Offset(
-                      (widget.switchLabelPosition ||
-                                  dialKey.globalPaintBounds == null
-                              ? 0
-                              : dialKey.globalPaintBounds!.size.width) +
-                          max(widget.childrenButtonSize.width - 56, 0) / 2,
-                      0)
-                  : widget.direction.isLeft
-                      ? Offset(
-                          -10.0, dialKey.globalPaintBounds!.size.height / 2)
-                      : widget.direction.isRight ||
-                              dialKey.globalPaintBounds == null
-                          ? Offset(dialKey.globalPaintBounds!.size.width + 12,
-                              dialKey.globalPaintBounds!.size.height / 2)
-                          : const Offset(-10.0, 0.0),
-          link: layerLink,
-          showWhenUnlinked: false,
+        Align(
+          alignment: Alignment.bottomRight,
           child: Material(
             type: MaterialType.transparency,
             child: Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: widget.direction.isUp || widget.direction.isDown
-                    ? max(widget.buttonSize.width - 56, 0) / 2
-                    : 0,
-              ),
+              padding: EdgeInsets.only(right: 8, bottom: 12),
               margin: widget.spacing != null
                   ? EdgeInsets.fromLTRB(
-                      widget.direction.isRight ? widget.spacing! : 0,
-                      widget.direction.isDown ? widget.spacing! : 0,
-                      widget.direction.isLeft ? widget.spacing! : 0,
-                      widget.direction.isUp ? widget.spacing! : 0,
-                    )
+                widget.direction.isRight ? widget.spacing! : 0,
+                widget.direction.isDown ? widget.spacing! : 0,
+                widget.direction.isLeft ? widget.spacing! : 0,
+                widget.direction.isUp ? widget.spacing! : 0,
+              )
                   : null,
               child: _buildColumnOrRow(
                 widget.direction.isUp || widget.direction.isDown,
@@ -605,7 +560,7 @@ class _ChildrensOverlay extends StatelessWidget {
               ),
             ),
           ),
-        )),
+        )
       ],
     );
   }
