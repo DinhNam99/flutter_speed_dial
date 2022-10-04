@@ -216,12 +216,23 @@ class _SpeedDialState extends State<SpeedDial>
   }
 
   @override
+  void deactivate() {
+    //print('deactivate!');
+    if (_open) {
+      overlayEntry?.remove();
+    }
+    super.deactivate();
+  }
+
+  @override
   void dispose() {
+    //print('dispose!');
     if (widget.renderOverlay &&
         (backgroundOverlay != null && backgroundOverlay!.mounted)) {
       backgroundOverlay?.remove();
     }
-    overlayEntry?.dispose();
+
+    // overlayEntry?.dispose();
     _controller.dispose();
     widget.openCloseDial?.removeListener(_onOpenCloseDial);
     super.dispose();
@@ -247,6 +258,7 @@ class _SpeedDialState extends State<SpeedDial>
   }
 
   void _toggleChildren() {
+    //print('toggle children');
     if (!mounted) return;
 
     if (widget.children.isNotEmpty) {
@@ -322,80 +334,80 @@ class _SpeedDialState extends State<SpeedDial>
   Widget _renderButton() {
     var child = widget.animatedIcon != null
         ? Container(
-            child: Center(
-              child: AnimatedIcon(
-                icon: widget.animatedIcon!,
-                progress: _controller,
-                color: widget.animatedIconTheme?.color,
-                size: widget.animatedIconTheme?.size,
-              ),
-            ),
-            decoration: BoxDecoration(
-              shape: widget.gradientBoxShape,
-              gradient: widget.gradient,
-            ),
-          )
+      child: Center(
+        child: AnimatedIcon(
+          icon: widget.animatedIcon!,
+          progress: _controller,
+          color: widget.animatedIconTheme?.color,
+          size: widget.animatedIconTheme?.size,
+        ),
+      ),
+      decoration: BoxDecoration(
+        shape: widget.gradientBoxShape,
+        gradient: widget.gradient,
+      ),
+    )
         : AnimatedBuilder(
-            animation: _controller,
-            builder: (BuildContext context, Widget? _widget) =>
-                Transform.rotate(
-              angle:
-                  (widget.activeChild != null || widget.activeIcon != null) &&
-                          widget.useRotationAnimation
-                      ? _controller.value * widget.animationAngle
-                      : 0,
-              child: AnimatedSwitcher(
-                  duration: widget.animationDuration,
-                  child: (widget.child != null && _controller.value < 0.4)
-                      ? widget.child
-                      : (widget.activeIcon == null &&
-                                  widget.activeChild == null ||
-                              _controller.value < 0.4)
-                          ? Container(
-                              child: Center(
-                                child: widget.icon != null
-                                    ? Icon(
-                                        widget.icon,
-                                        key: const ValueKey<int>(0),
-                                        color: widget.iconTheme?.color,
-                                        size: widget.iconTheme?.size,
-                                      )
-                                    : widget.child,
-                              ),
-                              decoration: BoxDecoration(
-                                shape: widget.gradientBoxShape,
-                                gradient: widget.gradient,
-                              ),
-                            )
-                          : Transform.rotate(
-                              angle:
-                                  widget.useRotationAnimation ? -pi * 1 / 2 : 0,
-                              child: widget.activeChild ??
-                                  Container(
-                                    child: Center(
-                                      child: Icon(
-                                        widget.activeIcon,
-                                        key: const ValueKey<int>(1),
-                                        color: widget.iconTheme?.color,
-                                        size: widget.iconTheme?.size,
-                                      ),
-                                    ),
-                                    decoration: BoxDecoration(
-                                      shape: widget.gradientBoxShape,
-                                      gradient: widget.gradient,
-                                    ),
-                                  ),
-                            )),
-            ),
-          );
+      animation: _controller,
+      builder: (BuildContext context, Widget? _widget) =>
+          Transform.rotate(
+            angle:
+            (widget.activeChild != null || widget.activeIcon != null) &&
+                widget.useRotationAnimation
+                ? _controller.value * widget.animationAngle
+                : 0,
+            child: AnimatedSwitcher(
+                duration: widget.animationDuration,
+                child: (widget.child != null && _controller.value < 0.4)
+                    ? widget.child
+                    : (widget.activeIcon == null &&
+                    widget.activeChild == null ||
+                    _controller.value < 0.4)
+                    ? Container(
+                  child: Center(
+                    child: widget.icon != null
+                        ? Icon(
+                      widget.icon,
+                      key: const ValueKey<int>(0),
+                      color: widget.iconTheme?.color,
+                      size: widget.iconTheme?.size,
+                    )
+                        : widget.child,
+                  ),
+                  decoration: BoxDecoration(
+                    shape: widget.gradientBoxShape,
+                    gradient: widget.gradient,
+                  ),
+                )
+                    : Transform.rotate(
+                  angle:
+                  widget.useRotationAnimation ? -pi * 1 / 2 : 0,
+                  child: widget.activeChild ??
+                      Container(
+                        child: Center(
+                          child: Icon(
+                            widget.activeIcon,
+                            key: const ValueKey<int>(1),
+                            color: widget.iconTheme?.color,
+                            size: widget.iconTheme?.size,
+                          ),
+                        ),
+                        decoration: BoxDecoration(
+                          shape: widget.gradientBoxShape,
+                          gradient: widget.gradient,
+                        ),
+                      ),
+                )),
+          ),
+    );
 
     var label = AnimatedSwitcher(
       duration: widget.animationDuration,
       transitionBuilder: widget.labelTransitionBuilder ??
-          (child, animation) => FadeTransition(
-                opacity: animation,
-                child: child,
-              ),
+              (child, animation) => FadeTransition(
+            opacity: animation,
+            child: child,
+          ),
       child: (!_open || widget.activeLabel == null)
           ? widget.label
           : widget.activeLabel,
@@ -443,15 +455,15 @@ class _SpeedDialState extends State<SpeedDial>
   Widget build(BuildContext context) {
     return (kIsWeb || !Platform.isIOS) && widget.closeDialOnPop
         ? WillPopScope(
-            child: _renderButton(),
-            onWillPop: () async {
-              if (_open) {
-                _toggleChildren();
-                return false;
-              }
-              return true;
-            },
-          )
+      child: _renderButton(),
+      onWillPop: () async {
+        if (_open) {
+          _toggleChildren();
+          return false;
+        }
+        return true;
+      },
+    )
         : _renderButton();
   }
 }
@@ -477,55 +489,55 @@ class _ChildrensOverlay extends StatelessWidget {
   List<Widget> _getChildrenList() {
     return widget.children
         .map((SpeedDialChild child) {
-          int index = widget.children.indexOf(child);
+      int index = widget.children.indexOf(child);
 
-          return AnimatedChild(
-            animation: Tween(begin: 0.0, end: 1.0).animate(
-              CurvedAnimation(
-                parent: controller,
-                curve: Interval(
-                  index / widget.children.length,
-                  1.0,
-                  curve: widget.animationCurve ?? Curves.ease,
-                ),
-              ),
+      return AnimatedChild(
+        animation: Tween(begin: 0.0, end: 1.0).animate(
+          CurvedAnimation(
+            parent: controller,
+            curve: Interval(
+              index / widget.children.length,
+              1.0,
+              curve: widget.animationCurve ?? Curves.ease,
             ),
-            index: index,
-            margin: widget.spaceBetweenChildren != null
-                ? EdgeInsets.fromLTRB(
-                    widget.direction.isRight ? widget.spaceBetweenChildren! : 0,
-                    widget.direction.isDown ? widget.spaceBetweenChildren! : 0,
-                    widget.direction.isLeft ? widget.spaceBetweenChildren! : 0,
-                    widget.direction.isUp ? widget.spaceBetweenChildren! : 0,
-                  )
-                : null,
-            btnKey: child.key,
-            useColumn: widget.direction.isLeft || widget.direction.isRight,
-            visible: child.visible,
-            switchLabelPosition: widget.switchLabelPosition,
-            backgroundColor: child.backgroundColor,
-            foregroundColor: child.foregroundColor,
-            elevation: child.elevation,
-            buttonSize: widget.childrenButtonSize,
-            child: child.child,
-            label: child.label,
-            labelStyle: child.labelStyle,
-            labelBackgroundColor: child.labelBackgroundColor,
-            labelWidget: child.labelWidget,
-            labelShadow: child.labelShadow,
-            onTap: child.onTap,
-            onLongPress: child.onLongPress,
-            toggleChildren: () {
-              if (!widget.closeManually) toggleChildren();
-            },
-            shape: child.shape,
-            heroTag: widget.heroTag != null
-                ? '${widget.heroTag}-child-$index'
-                : null,
-            childMargin: widget.childMargin,
-            childPadding: widget.childPadding,
-          );
-        })
+          ),
+        ),
+        index: index,
+        margin: widget.spaceBetweenChildren != null
+            ? EdgeInsets.fromLTRB(
+          widget.direction.isRight ? widget.spaceBetweenChildren! : 0,
+          widget.direction.isDown ? widget.spaceBetweenChildren! : 0,
+          widget.direction.isLeft ? widget.spaceBetweenChildren! : 0,
+          widget.direction.isUp ? widget.spaceBetweenChildren! : 0,
+        )
+            : null,
+        btnKey: child.key,
+        useColumn: widget.direction.isLeft || widget.direction.isRight,
+        visible: child.visible,
+        switchLabelPosition: widget.switchLabelPosition,
+        backgroundColor: child.backgroundColor,
+        foregroundColor: child.foregroundColor,
+        elevation: child.elevation,
+        buttonSize: widget.childrenButtonSize,
+        child: child.child,
+        label: child.label,
+        labelStyle: child.labelStyle,
+        labelBackgroundColor: child.labelBackgroundColor,
+        labelWidget: child.labelWidget,
+        labelShadow: child.labelShadow,
+        onTap: child.onTap,
+        onLongPress: child.onLongPress,
+        toggleChildren: () {
+          if (!widget.closeManually) toggleChildren();
+        },
+        shape: child.shape,
+        heroTag: widget.heroTag != null
+            ? '${widget.heroTag}-child-$index'
+            : null,
+        childMargin: widget.childMargin,
+        childPadding: widget.childPadding,
+      );
+    })
         .toList()
         .reversed
         .toList();
@@ -570,20 +582,22 @@ class _ChildrensOverlay extends StatelessWidget {
 
 Widget _buildColumnOrRow(bool isColumn,
     {CrossAxisAlignment? crossAxisAlignment,
-    MainAxisAlignment? mainAxisAlignment,
-    required List<Widget> children,
-    MainAxisSize? mainAxisSize}) {
+      MainAxisAlignment? mainAxisAlignment,
+      required List<Widget> children,
+      MainAxisSize? mainAxisSize}) {
   return isColumn
       ? Column(
-          mainAxisSize: mainAxisSize ?? MainAxisSize.max,
-          mainAxisAlignment: mainAxisAlignment ?? MainAxisAlignment.start,
-          crossAxisAlignment: crossAxisAlignment ?? CrossAxisAlignment.center,
-          children: children,
-        )
+    mainAxisSize: mainAxisSize ?? MainAxisSize.max,
+    mainAxisAlignment: mainAxisAlignment ?? MainAxisAlignment.start,
+    crossAxisAlignment: crossAxisAlignment ?? CrossAxisAlignment.center,
+    children: children,
+  )
       : Row(
-          mainAxisSize: mainAxisSize ?? MainAxisSize.max,
-          mainAxisAlignment: mainAxisAlignment ?? MainAxisAlignment.start,
-          crossAxisAlignment: crossAxisAlignment ?? CrossAxisAlignment.center,
-          children: children,
-        );
+    mainAxisSize: mainAxisSize ?? MainAxisSize.max,
+    mainAxisAlignment: mainAxisAlignment ?? MainAxisAlignment.start,
+    crossAxisAlignment: crossAxisAlignment ?? CrossAxisAlignment.center,
+    children: children,
+  );
 }
+
+
